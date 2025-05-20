@@ -1,87 +1,116 @@
-//#include <iostream>
-//using namespace std;
-//
-//
-//struct stack {
-//	char inf;
-//	stack* next;
-//};
-//
-//
-//void push(stack*& h, char x) { //вставка
-//	stack* r = new stack;
-//	r->inf = x;
-//	r->next = h;
-//	h = r;
-//}
-//
-//
-//char pop(stack*& h) { //удаление
-//	char i = h->inf;
-//	stack* r = h;
-//	h = h->next;
-//	delete r;
-//	return i;
-//}
-//
-//void reverse(stack*& h) {
-//	stack* head1 = NULL; //промежут стек
-//	while (h) {
-//		push(head1, pop(h)); //добавляем элементы в промежут стек
-//	}
-//	h = head1; //переобозначаем указатель
-//}
-//
-//
-//bool in(char c) {
-//	return(c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u');
-//}
-//
-//
-//stack* result(stack*& h) {
-//	stack* res = NULL;
-//	stack* h1 = NULL;
-//	char last;
-//	while (h) {
-//		char x = pop(h);
-//		push(h1, x);
-//		if (in(x)) last = x;
-//	}
-//	/*reverse(h1);*/
-//	bool f = false; //для проверки на последнюю гласную
-//	while (h1) {
-//		char x = pop(h1);
-//		
-//		if (x == last && !f) { //вставка ! после последней гласной
-//			push(res, '!');
-//			f = true;
-//		}
-//		push(res, x);
-//	}
-//	/*reverse(res);*/
-//	return res;
-//}
-//
-//
-//int main() {
-//	int n; cout << "n = "; cin >> n; //кол-во букв
-//	stack* head = NULL;
-//	char x;
-//
-//	for (int i = 0; i < n; i++) { //создаём стек
-//		cin >> x;
-//		push(head, x);
-//	}
-//
-//	reverse(head); //разворачиваем стек
-//
-//	stack* res = result(head); //рез-т
-//
-//	while (res) { //вывод рез-та
-//		cout << pop(res) << " ";
-//	}
-//
-//	cout << endl;
-//
-//	return 0;
-//}
+#include<iostream>
+#include<stack>
+using namespace std;
+
+
+struct list {
+	int inf;
+	list* next;
+	list* prev;
+};
+
+
+void push(list*& h, list*& t, int x) { //вставка в конец списка
+	list* r = new list;
+	r->inf = x;
+	r->next = NULL;
+	if (!h && !t) {
+		r->prev = NULL;
+		h = r;
+	}
+	else {
+		t->next = r;
+		r->prev = t;
+	}
+	t = r;
+}
+
+
+void insert_after(list*& h, list*& t, list* r, int y) {
+	list* p = new list;
+	p->inf = y;
+	if (r == t) {
+		p->next = NULL;
+		p->prev = r;
+		r->next = p;
+		t = p;
+	}
+	else {
+		r->next->prev = p;
+		p->next = r->next;
+		p->prev = r;
+		r->next = p;
+	}
+}
+
+
+void print(list* h) { //вывод списка
+	list* p = h;
+	while (p) {
+		cout << p->inf << " ";
+		p = p->next;
+	}
+	cout << endl;
+}
+
+
+int find_min(list* h) {
+	int minn = h->inf;
+	while (h) {
+		if (h->inf < minn) {
+			minn = h->inf;
+		}
+		h = h->next;
+	}
+	return minn;
+}
+
+
+int find_last_even(list* h) {
+	int last = -1;
+	while (h) {
+		if (h->inf % 2 == 0) {
+			last = h->inf;
+		}
+		h = h->next;
+	}
+	return last;
+}
+
+
+int main() {
+	list* head = NULL;
+	list* tail = NULL;
+
+	int n; cout << "n ="; cin >> n;
+
+	for (int i = 0; i < n; i++) {
+		int x;
+		cin >> x;
+		push(head, tail, x);
+	}
+
+	int minn = find_min(head);
+	int last_even = find_last_even(head);
+
+	if (last_even != -1) {
+		list* curr = head;
+		while (curr) {
+			list* next_node = curr->next;
+			if (curr->inf == minn) {
+				insert_after(head, tail, curr, last_even);
+
+				curr = next_node;
+			}
+			else {
+				curr = curr->next;
+			}
+		}
+	}
+
+	cout << "res = ";
+	print(head);
+
+	system("pause");
+	return 0;
+}
